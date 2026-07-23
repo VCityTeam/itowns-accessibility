@@ -48,6 +48,11 @@ const config = (env) => {
                 '.js',
                 '.ts',
             ],
+            alias: {
+                'itowns-debug$': path.resolve(__dirname, 'node_modules/itowns/dist/debug.js'),
+                'itowns-gui-tools$': path.resolve(__dirname, 'node_modules/itowns/examples/jsm/GUI/GuiTools.js'),
+                dat$: 'dat.gui',
+            },
             fallback: {
                 fs: false,
             },

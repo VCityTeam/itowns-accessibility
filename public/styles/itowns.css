@@ -11,3 +11,17 @@ html, body {
     z-index: 0;
     height: 100%;
 }
+
+#menuDiv {
+    position: absolute;
+    left: 10px;
+    top: 0px;
+    z-index: 1;
+}
+
+#menuDiv, .ac {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

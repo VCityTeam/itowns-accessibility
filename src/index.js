@@ -1,4 +1,6 @@
 import * as itowns from 'itowns';
+import GuiTools from 'itowns-gui-tools';
+import * as itownsDebug from 'itowns-debug';
 
 var scaler, meshes = [];
 // Get our `<div id="viewerId">` element. When creating a `View`, a canvas will
@@ -12,6 +14,9 @@ const placement = {
 };
 // Create an empty Globe View
 const view = new itowns.GlobeView(viewerDiv, placement);
+
+// Debug UI: dat.gui layer panel + tile debug overlay
+const menuGlobe = new GuiTools('menuDiv', view);
 
 // Declare your data source configuration. In this context, those are the
 // parameters used in the WMTS requests.
@@ -32,7 +37,7 @@ const imageryLayer = new itowns.ColorLayer('imagery', {
 });
 
 // Add it to source view!
-view.addLayer(imageryLayer);
+view.addLayer(imageryLayer).then(menuGlobe.addLayerGUI.bind(menuGlobe));
 
 
 // Add two elevation layers.
@@ -124,8 +129,7 @@ var wfsBuildingLayer = new itowns.FeatureGeometryLayer('WFS Building',{
         extrusion_height: extrudeBuildings } }
 });
 
-view.addLayer(wfsBuildingLayer);
-
+view.addLayer(wfsBuildingLayer).then( (layer) => itownsDebug.GeometryDebug.createGeometryDebugUI(menuGlobe.gui, view, layer));
 
 // Declare the geojson source
 const parksSource = new itowns.FileSource({
@@ -149,12 +153,7 @@ const parksLayer = new itowns.ColorLayer('parks', {
     },
 });
 
-view.addLayer(parksLayer);
-
-function colorIsochrones(properties) {
-    return properties.color || 'blue';
-}
-
+view.addLayer(parksLayer).then(menuGlobe.addLayerGUI.bind(menuGlobe));
 
 
 const isochronesSource = new itowns.FileSource({
@@ -169,7 +168,7 @@ const isochronesLayer = new itowns.ColorLayer('isochrones', {
     source: isochronesSource,
     style: {
         fill: {
-            color: colorIsochrones,
+            color: properties => properties.color || 'blue',
             opacity: 0.5,
         },
         stroke: {
@@ -178,7 +177,7 @@ const isochronesLayer = new itowns.ColorLayer('isochrones', {
     },
 });
 
-//view.addLayer(isochronesLayer);
+view.addLayer(isochronesLayer).then(menuGlobe.addLayerGUI.bind(menuGlobe)); 
 
 
 const isolinesSource = new itowns.FileSource({
@@ -193,7 +192,7 @@ const isolinesLayer = new itowns.ColorLayer('isolines', {
     source: isolinesSource,
     style: {
         fill: {
-            color: colorIsochrones,
+            color: properties => properties.color,
             opacity: 0.5,
         },
         stroke: {
@@ -203,4 +202,6 @@ const isolinesLayer = new itowns.ColorLayer('isolines', {
     },
 });
 
-view.addLayer(isolinesLayer);
+view.addLayer(isolinesLayer).then(menuGlobe.addLayerGUI.bind(menuGlobe));
+
+itownsDebug.createTileDebugUI(menuGlobe.gui, view);
