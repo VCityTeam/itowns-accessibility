@@ -133,7 +133,7 @@ const parksSource = new itowns.FileSource({
     crs: 'EPSG:4326',
     format: 'application/json',
 });
-// Create a ColorLayer for the Ariege area
+
 const parksLayer = new itowns.ColorLayer('parks', {
     name: 'parks',
     transparent: true,
@@ -150,3 +150,57 @@ const parksLayer = new itowns.ColorLayer('parks', {
 });
 
 view.addLayer(parksLayer);
+
+function colorIsochrones(properties) {
+    return properties.color || 'blue';
+}
+
+
+
+const isochronesSource = new itowns.FileSource({
+    url: './layers/GeoJSON/isochrones_parks_3857.geojson',
+    crs: 'EPSG:3857',
+    format: 'application/json',
+});
+
+const isochronesLayer = new itowns.ColorLayer('isochrones', {
+    name: 'isochrones',
+    transparent: true,
+    source: isochronesSource,
+    style: {
+        fill: {
+            color: colorIsochrones,
+            opacity: 0.5,
+        },
+        stroke: {
+            color: 'white',
+        },
+    },
+});
+
+//view.addLayer(isochronesLayer);
+
+
+const isolinesSource = new itowns.FileSource({
+    url: './layers/GeoJSON/isolines_parks_3857.geojson',
+    crs: 'EPSG:3857',
+    format: 'application/json',
+});
+
+const isolinesLayer = new itowns.ColorLayer('isolines', {
+    name: 'isolines',
+    transparent: true,
+    source: isolinesSource,
+    style: {
+        fill: {
+            color: colorIsochrones,
+            opacity: 0.5,
+        },
+        stroke: {
+            color: properties => properties.color || 'white',
+            width: 5
+        },
+    },
+});
+
+view.addLayer(isolinesLayer);
