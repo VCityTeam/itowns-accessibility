@@ -8,10 +8,11 @@ var scaler, meshes = [];
 const viewerDiv = document.getElementById('viewerDiv');
 
 // Define an initial camera position
-const placement = {
-    coord: new itowns.Coordinates('EPSG:4326', 4.835119, 45.757838),
-    range: 25000,
-};
+var placement = {
+    coord: new itowns.Coordinates('EPSG:4326', 4.855978, 45.761056), 
+    range: 3000,
+    tilt: 45,
+}
 // Create an empty Globe View
 const view = new itowns.GlobeView(viewerDiv, placement);
 
