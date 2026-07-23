@@ -69,9 +69,6 @@ function extrudeBuildings(properties) {
     return properties.hauteur;
 }
 
-var useFixedHeight = true;
-var useFixedColor = true;
-
 function acceptFeature(properties) {
     return !!properties.hauteur;
 }
@@ -128,3 +125,28 @@ var wfsBuildingLayer = new itowns.FeatureGeometryLayer('WFS Building',{
 });
 
 view.addLayer(wfsBuildingLayer);
+
+
+// Declare the geojson source
+const parksSource = new itowns.FileSource({
+    url: './layers/GeoJSON/parks.geojson',
+    crs: 'EPSG:4326',
+    format: 'application/json',
+});
+// Create a ColorLayer for the Ariege area
+const parksLayer = new itowns.ColorLayer('parks', {
+    name: 'parks',
+    transparent: true,
+    source: parksSource,
+    style: {
+        fill: {
+            color: 'green',
+            opacity: 0.5,
+        },
+        stroke: {
+            color: 'white',
+        },
+    },
+});
+
+view.addLayer(parksLayer);
