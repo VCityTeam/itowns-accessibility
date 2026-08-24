@@ -175,7 +175,7 @@ function rayoncouronne_m_function(properties) {
 }
 
 function hauteurfut_m_function(properties) {
-    return properties.hauteurfut_m || 20;
+    return properties.hauteurfut_m || 5;
 }
 
 function hauteurtotale_m_function(properties) {
@@ -221,9 +221,9 @@ function buildTreeInstances(featureMesh) {
         for (let i = 0; i < count; i++) {
             const gx = positions[i * 3];
             const gy = positions[i * 3 + 1];
-            const gz = positions[i * 3 + 2];
+            const gz = positions[i * 3 + 2] - 2;
             const properties = geometries[i].properties;
-            const trunkRadius = 2;
+            const trunkRadius = 1.5;
             const trunkHeight = hauteurfut_m_function(properties);
             const canopyRadius = rayoncouronne_m_function(properties);
 
@@ -233,16 +233,13 @@ function buildTreeInstances(featureMesh) {
             trunkMesh.setMatrixAt(i, matrix);
 
             position.set(gx, gy, gz + trunkHeight - canopyRadius / 3);
-            scale.set(canopyRadius, canopyRadius, canopyRadius);
+            scale.set(canopyRadius, canopyRadius, canopyRadius / 2);
             matrix.compose(position, treeIdentityQuaternion, scale);
             canopyMesh.setMatrixAt(i, matrix);
         }
         trunkMesh.instanceMatrix.needsUpdate = true;
         canopyMesh.instanceMatrix.needsUpdate = true;
 
-        // Fully drop the point sprite (not just hide it) - otherwise every
-        // tile carries its GPU buffers in addition to the trunk/canopy
-        // InstancedMesh we just built from its (already correct) positions.
         const parent = obj.parent;
         parent.remove(obj);
         obj.geometry.dispose();
