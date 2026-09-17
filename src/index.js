@@ -300,7 +300,7 @@ view.addLayer(parksLayer).then(menuGlobe.addLayerGUI.bind(menuGlobe));
 
 
 const isochronesSource = new itowns.FileSource({
-    url: './layers/GeoJSON/isochrones_parks_3857.geojson',
+    url: './layers/GeoJSON/isochrones_single_park.geojson',
     crs: 'EPSG:3857',
     format: 'application/json',
 });
@@ -324,7 +324,7 @@ view.addLayer(isochronesLayer).then(menuGlobe.addLayerGUI.bind(menuGlobe));
 
 
 const isolinesSource = new itowns.FileSource({
-    url: './layers/GeoJSON/isolines_parks_3857.geojson',
+    url: './layers/GeoJSON/isolines_single_park.geojson',
     crs: 'EPSG:3857',
     format: 'application/json',
 });
@@ -340,7 +340,7 @@ const isolinesLayer = new itowns.ColorLayer('isolines', {
         },
         stroke: {
             color: properties => properties.color || 'white',
-            width: 5
+            width: 4
         },
     },
 });
