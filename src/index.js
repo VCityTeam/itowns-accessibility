@@ -299,52 +299,77 @@ const parksLayer = new itowns.ColorLayer('parks', {
 view.addLayer(parksLayer).then(menuGlobe.addLayerGUI.bind(menuGlobe));
 
 
-const isochronesSource = new itowns.FileSource({
-    url: './layers/GeoJSON/isochrones_single_park.geojson',
-    crs: 'EPSG:3857',
-    format: 'application/json',
-});
+// Parks with precomputed impact zones. `file` is the suffix of the
+// isochrones_<file>.geojson / isolines_<file>.geojson pair.
+const impactZones = [
+    { label: 'All parks', file: 'parks_3857' },
+    { label: "Parc de la Tête d'Or", file: 'tete_dor' },
+    { label: "Parc de l'Europe", file: 'europe' },
+    { label: 'Parc de l\'Hippodrome', file: 'hippodrome' },
+    { label: 'Parc René Dumont', file: 'rene_dumont' },
+    { label: 'Parc Étienne Gagnaire', file: 'etienne_gagnaire' },
+];
 
-const isochronesLayer = new itowns.ColorLayer('isochrones', {
-    name: 'isochrones',
-    transparent: true,
-    source: isochronesSource,
-    style: {
-        fill: {
-            color: properties => properties.color || 'blue',
-            opacity: 0.5,
+function createIsochronesLayer(file) {
+    return new itowns.ColorLayer('isochrones', {
+        name: 'isochrones',
+        transparent: true,
+        source: new itowns.FileSource({
+            url: `./layers/GeoJSON/isochrones_${file}.geojson`,
+            crs: 'EPSG:3857',
+            format: 'application/json',
+        }),
+        style: {
+            fill: {
+                color: properties => properties.color || 'blue',
+                opacity: 0.5,
+            },
+            stroke: {
+                color: 'white',
+            },
         },
-        stroke: {
-            color: 'white',
+    });
+}
+
+function createIsolinesLayer(file) {
+    return new itowns.ColorLayer('isolines', {
+        name: 'isolines',
+        transparent: true,
+        source: new itowns.FileSource({
+            url: `./layers/GeoJSON/isolines_${file}.geojson`,
+            crs: 'EPSG:3857',
+            format: 'application/json',
+        }),
+        style: {
+            fill: {
+                color: properties => properties.color,
+                opacity: 0.5,
+            },
+            stroke: {
+                color: properties => properties.color || 'white',
+                width: 4
+            },
         },
-    },
-});
+    });
+}
 
-view.addLayer(isochronesLayer).then(menuGlobe.addLayerGUI.bind(menuGlobe)); 
+function showImpactZone(file) {
+    ['isochrones', 'isolines'].forEach((id) => {
+        if (view.getLayerById(id)) {
+            view.removeLayer(id);
+            menuGlobe.removeLayersGUI(id);
+        }
+    });
+    view.addLayer(createIsochronesLayer(file)).then(menuGlobe.addLayerGUI.bind(menuGlobe));
+    view.addLayer(createIsolinesLayer(file)).then(menuGlobe.addLayerGUI.bind(menuGlobe));
+}
 
+// Park selector in the dat.gui panel.
+const parkOptions = {};
+impactZones.forEach((zone) => { parkOptions[zone.label] = zone.file; });
+const parkSelection = { park: 'tete_dor' };
+menuGlobe.gui.add(parkSelection, 'park', parkOptions).name('Park impact zone').onChange(showImpactZone);
 
-const isolinesSource = new itowns.FileSource({
-    url: './layers/GeoJSON/isolines_single_park.geojson',
-    crs: 'EPSG:3857',
-    format: 'application/json',
-});
-
-const isolinesLayer = new itowns.ColorLayer('isolines', {
-    name: 'isolines',
-    transparent: true,
-    source: isolinesSource,
-    style: {
-        fill: {
-            color: properties => properties.color,
-            opacity: 0.5,
-        },
-        stroke: {
-            color: properties => properties.color || 'white',
-            width: 4
-        },
-    },
-});
-
-view.addLayer(isolinesLayer).then(menuGlobe.addLayerGUI.bind(menuGlobe));
+showImpactZone(parkSelection.park);
 
 itownsDebug.createTileDebugUI(menuGlobe.gui, view);
